@@ -37,6 +37,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'faceapp',
+    'django_nvd3',
+    'djangobower',
+    'django.contrib.staticfiles',
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -80,7 +84,40 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
+PROJECT_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), ".."),
+)
+STATICFILES_DIRS = (
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    '/Users/kent/Documents/workspace/FaceWeb/src/static/',
+)
+
+# STATIC_ROOT = '/Users/kent/Documents/workspace/FaceWeb/src/static/'
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = '/Users/kent/Documents/workspace/FaceWeb/media'
 MEDIA_URL = '/media/'
+
+
+
+
+BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, 'components')
+
+
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'djangobower.finders.BowerFinder',
+)
+
+# BOWER_PATH = '/usr/bin/bower'
+
+BOWER_INSTALLED_APPS = (
+    'jquery',
+    'underscore',
+)

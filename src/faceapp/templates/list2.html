@@ -170,7 +170,7 @@
 		
 			{% if documents %}
 				{% for document in documents %}
-					<img class="cover"   src="{{ document.docfile.url }}" alt='{{ document.docfile.name }}' /></li>
+					<img class="cover"  width="300px" src="{{ document.docfile.url }}" alt='{{ document.docfile.name }}' /></li>
 				{% endfor %}
 			{% else %}
 			{% endif %}		
@@ -211,5 +211,6 @@
 		</form>
 		</div>
 		</center>
+		
     </body>
 </html>

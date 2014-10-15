@@ -36,8 +36,8 @@ def faceDetect(img):
     file_bytes = numpy.asarray(bytearray(img.read()), dtype=numpy.uint8)
     img_data_ndarray = cv2.imdecode(file_bytes, cv2.CV_LOAD_IMAGE_UNCHANGED)
     
-    if img_data_ndarray.shape[1] > 300 :
-        fx = float(300)/img_data_ndarray.shape[1]
+    if img_data_ndarray.shape[1] > 600 :
+        fx = float(600)/img_data_ndarray.shape[1]
         fy = fx
         img_data_ndarray = cv2.resize(img_data_ndarray, (0,0), fx=fx , fy=fy ) 
     
@@ -52,7 +52,7 @@ def faceDetect(img):
         gray,
         scaleFactor=1.1,
         minNeighbors=5,
-        minSize=(img_data_ndarray.shape[1]/30, img_data_ndarray.shape[1]/30),
+        minSize=(img_data_ndarray.shape[1]/100, img_data_ndarray.shape[1]/100),
         flags = cv2.cv.CV_HAAR_SCALE_IMAGE
     )
     
@@ -96,3 +96,46 @@ def list(request):
         {'documents': documents, 'form': form},
         context_instance=RequestContext(request)
     )
+    
+def demo_piechart(request):
+    """
+    pieChart page
+    """
+    
+    
+    from impala.dbapi import connect
+    conn = connect(host='210.63.38.209', port=21050)
+    cur = conn.cursor()
+    cur.execute('select cat , count(pid) from abc_item group by cat limit 10')
+    
+    print cur.description # prints the result set's schema
+    alldata = cur.fetchall()
+    
+    xdata = []
+    ydata =[]
+    for item in alldata :
+        xdata.append(item[0])
+        ydata.append(item[1])
+
+    color_list = ['#5d8aa8', '#e32636', '#efdecd', '#ffbf00', '#ff033e', '#a4c639',
+                  '#b2beb5', '#8db600', '#7fffd4', '#ff007f', '#ff55a3', '#5f9ea0']
+    extra_serie = {
+        "tooltip": {"y_start": "", "y_end": " cal"},
+        "color_list": color_list
+    }
+    chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
+    charttype = "pieChart"
+    chartcontainer = 'piechart_container'  # container name
+
+    data = {
+        'charttype': charttype,
+        'chartdata': chartdata,
+        'chartcontainer': chartcontainer,
+        'extra': {
+            'x_is_date': False,
+            'x_axis_format': '',
+            'tag_script_js': True,
+            'jquery_on_ready': False,
+        }
+    }
+    return render_to_response('piechart.html', data)

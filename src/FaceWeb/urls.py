@@ -11,10 +11,13 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-#     url(r'^$', 'faceapp.views.home'),
-    url(r'^$', include('faceapp.urls')),
+    url(r'^', include('faceapp.urls')),
 
 )+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+urlpatterns = urlpatterns + static('/images/', document_root='/Users/kent/Documents/workspace/FaceWeb/media/images')
+urlpatterns = urlpatterns + static('/js/', document_root='/Users/kent/Documents/workspace/FaceWeb/media/js')
+urlpatterns = urlpatterns + static('/css/', document_root='/Users/kent/Documents/workspace/FaceWeb/media/css')
+# urlpatterns = urlpatterns + static('/static/', document_root='/Users/kent/Documents/workspace/FaceWeb/src/static')
 
 

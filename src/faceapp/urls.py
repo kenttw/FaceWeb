@@ -13,4 +13,6 @@ from django.conf.urls.static import static
 
 urlpatterns = patterns('faceapp.views',
     url(r'^$', 'list', name='list'),
+    url(r'^piechart/', 'demo_piechart', name='demo_piechart'),
+
 )
