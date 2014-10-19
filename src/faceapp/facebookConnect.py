@@ -59,9 +59,16 @@ def download_photo(img_url):
     response = opener.open(img_url)
 #     htmlData = response.read()
     return response
+
 def faceDetect(img):
     cascPath = '/Users/kent/Documents/workspace/FaceDetect/src/haarcascade_frontalface_default.xml'
+    cascSmile = '/opt/opencv/opencv/data/haarcascades/haarcascade_smile.xml'
+    
+    
     faceCascade = cv2.CascadeClassifier(cascPath)
+    smileCascade = cv2.CascadeClassifier(cascSmile)
+
+    
     file_bytes = numpy.asarray(bytearray(img.read()), dtype=numpy.uint8)
     img_data_ndarray = cv2.imdecode(file_bytes, cv2.CV_LOAD_IMAGE_UNCHANGED)
     
@@ -71,25 +78,64 @@ def faceDetect(img):
         img_data_ndarray = cv2.resize(img_data_ndarray, (0, 0), fx=fx , fy=fy) 
     
     gray = cv2.cvtColor(img_data_ndarray, cv2.COLOR_BGR2GRAY)
-    # Detect faces in the image
-    faces = faceCascade.detectMultiScale(
-        gray,
-        scaleFactor=1.1,
-        minNeighbors=5,
-        minSize=(img_data_ndarray.shape[1] / 100, img_data_ndarray.shape[1] / 100),
-        flags=cv2.cv.CV_HAAR_SCALE_IMAGE
-    )
     
+    faces = detect(gray, faceCascade)
+#     vis = img.copy()
+    draw_rects(img_data_ndarray, faces, (0, 255, 0))   
+    print "Found {0} faces!".format(len(faces))
+    
+    for x1, y1, x2, y2 in faces:
+        roi = gray[y1:y2, x1:x2]
+        vis_roi = gray[y1:y2, x1:x2]
+        subrects = detect(roi.copy(), smileCascade)
+        print "Found {0} smile!".format(len(subrects))
+ 
+        draw_rects(img_data_ndarray, subrects, (255, 0, 0))    
+    
+    
+    
+    
+
+#     # Detect faces in the image
+#     faces = faceCascade.detectMultiScale(
+#         gray,
+#         scaleFactor=1.1,
+#         minNeighbors=5,
+#         minSize=(img_data_ndarray.shape[1] / 100, img_data_ndarray.shape[1] / 100),
+#         flags=cv2.cv.CV_HAAR_SCALE_IMAGE
+#     )
+#     
+#     
+#         # Detect faces in the image
+#     smiles = smileCascade.detectMultiScale(
+#         gray,
+#         scaleFactor=1.1,
+#         minNeighbors=5,
+#         minSize=(img_data_ndarray.shape[1] / 300, img_data_ndarray.shape[1] / 300),
+#         flags = cv2.cv.CV_HAAR_SCALE_IMAGE
+#     )  
+#     
     print "Found {0} faces!".format(len(faces))
     if len(faces) == 0 :
         return None
     
-    # Draw a rectangle around the faces
-    for (x, y, w, h) in faces:
-        cv2.rectangle(img_data_ndarray, (x, y), (x + w, y + h), (0, 255, 0), 2)
+#     # Draw a rectangle around the faces
+#     for (x, y, w, h) in faces:
+#         cv2.rectangle(img_data_ndarray, (x, y), (x + w, y + h), (0, 255, 0), 2)
     
     
     img_data_ndarray = cv2.imencode('.jpg', img_data_ndarray)[1].tostring()
     file = ContentFile(img_data_ndarray)
     file.name = 'aa.jpg'
     return file
+
+def detect(img, cascade,size=50):
+    rects = cascade.detectMultiScale(img, scaleFactor=1.3, minNeighbors=4, minSize=(size, size), flags = cv2.CASCADE_SCALE_IMAGE)
+    if len(rects) == 0:
+        return []
+    rects[:,2:] += rects[:,:2]
+    return rects
+
+def draw_rects(img, rects, color):
+    for x1, y1, x2, y2 in rects:
+        cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)

@@ -20,19 +20,19 @@ def list(request):
     
     
     current_user = facebookConnect.getFBContent(request.COOKIES)
-#     if current_user != None :
-#         for photo in current_user.photos :
-#             dimag = facebookConnect.download_photo(photo)
-#             facesresult = facebookConnect.faceDetect(dimag)
-#             if facesresult != None :
-#                 newdoc = Document(docfile=facesresult)
-#                 newdoc.save()
+    if current_user != None :
+        for photo in current_user.photos :
+            dimag = facebookConnect.download_photo(photo)
+            facesresult = facebookConnect.faceDetect(dimag)
+            if facesresult != None :
+                newdoc = Document(docfile=facesresult)
+                newdoc.save()
 
     
     
     # Handle file upload
     
-    if request.method == 'POST':
+    if current_user != None and request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         
         if form.is_valid():
