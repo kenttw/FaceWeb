@@ -11,44 +11,61 @@ import numpy
 from django.core.files import File
 from django.core.files.base import ContentFile
 
+
+import faceapp
+
 facebook_app_id = '258318471185'
 facebook_app_secret = 'da26ac5b7675c75cc2b9a25d87b6b8af'
+cascPath = '/Users/kent/Documents/workspace/FaceDetect/src/haarcascade_frontalface_default.xml'
+cascSmile = '/opt/opencv/opencv/data/haarcascades/haarcascade_smile.xml'
 
 
-class current_user:
-    profile_url = None
-    id = None
-    name = None
-    photos = None
-    access_token = None
+faceCascade = cv2.CascadeClassifier(cascPath)
+smileCascade = cv2.CascadeClassifier(cascSmile)
+
+# class current_user:
+#     profile_url = None
+#     id = None
+#     name = None
+#     photos = None
+#     access_token = None
     
-
-def getFBContent(cookies):
-#             cookies = dict((n, self.cookies[n].value) for n in self.cookies.keys())
-    
-    user = current_user()
+def getGraph(cookies):
     cookie = facebook.get_user_from_cookie(
         cookies, facebook_app_id, facebook_app_secret)
-    
     if cookie == None :
         return 
-    
     graph = facebook.GraphAPI(cookie["access_token"])
+    return graph
+
+def getPhotos(graph):
+    r = []
+    photos = graph.get_object('me?fields=photos')
+#     photos['photos']['data'][0]['images'][0]['source']
+    for item in photos['photos']['data'] :
+        for item3 in item['images'] :
+            r.append(item3['source'])
+            
+    return r
+
+def getFBContent(graph,access_token):
+#             cookies = dict((n, self.cookies[n].value) for n in self.cookies.keys())
+    
+    user = faceapp.models.FbUser()
+ 
     profile = graph.get_object("me")
     user.name = profile['name']
     user.profile_url = profile['link']
     user.id = profile['id']
-    user.access_token = cookie['access_token']
+    user.access_token = access_token #cookie['access_token']
     
-    photos = graph.get_object('me?fields=photos')
-    user.photos = []
-        
+#     photos = graph.get_object('me?fields=photos')
         
 #         photos['photos']['data'][0]['images'][0]['source']
         
-    for item in photos['photos']['data'] :
-        for item3 in item['images'] :
-            user.photos.append(item3['source'])
+#     for item in photos['photos']['data'] :
+#         for item3 in item['images'] :
+#             user.photos.append(item3['source'])
             
     return user
             
@@ -61,13 +78,6 @@ def download_photo(img_url):
     return response
 
 def faceDetect(img):
-    cascPath = '/Users/kent/Documents/workspace/FaceDetect/src/haarcascade_frontalface_default.xml'
-    cascSmile = '/opt/opencv/opencv/data/haarcascades/haarcascade_smile.xml'
-    
-    
-    faceCascade = cv2.CascadeClassifier(cascPath)
-    smileCascade = cv2.CascadeClassifier(cascSmile)
-
     
     file_bytes = numpy.asarray(bytearray(img.read()), dtype=numpy.uint8)
     img_data_ndarray = cv2.imdecode(file_bytes, cv2.CV_LOAD_IMAGE_UNCHANGED)

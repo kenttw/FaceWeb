@@ -1,61 +1,64 @@
+import random
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from faceapp.models import Document
+from faceapp.models import Document , Photo
 from faceapp.form import DocumentForm
 
 from faceapp import facebookConnect
-# Create your views here.
-# Create your views here.
-
-def home(request):
-    return render(request, "index.html", {'excuse': 333, 'quantity':22 , 'price':33 })
-
-
-
 
 def list(request):
     
-    
-    current_user = facebookConnect.getFBContent(request.COOKIES)
-    if current_user != None :
-        for photo in current_user.photos :
-            dimag = facebookConnect.download_photo(photo)
-            facesresult = facebookConnect.faceDetect(dimag)
-            if facesresult != None :
-                newdoc = Document(docfile=facesresult)
-                newdoc.save()
-
-    
+    fbGraph = facebookConnect.getGraph(request.COOKIES)
+    current_user = None
+    if fbGraph != None :
+        access_token = 'todo'
+        current_user = facebookConnect.getFBContent(fbGraph,access_token)
+        current_user.access_token = access_token
+        photos = facebookConnect.getPhotos(fbGraph)
+        if current_user != None : 
+#             for url in  photos :
+#                 photourl = Photo()
+#                 photourl.url = url
+#                 photourl.user = current_user
+#                 dimag = facebookConnect.download_photo(url)
+#                 facesresult = facebookConnect.faceDetect(dimag)
+#                 if facesresult != None :
+#                     photourl.docfile = facesresult
+#                     photourl.save()
+            current_user.save()
     
     # Handle file upload
     
-    if current_user != None and request.method == 'POST':
-        form = DocumentForm(request.POST, request.FILES)
-        
-        if form.is_valid():
-            newdoc = Document(docfile=facebookConnect.faceDetect(request.FILES['docfile']))
-            newdoc.save()
-            
-            # Redirect to the document list after POST
-            return HttpResponseRedirect(reverse('faceapp.views.list'))
-    else:
-        form = DocumentForm()  # A empty, unbound form
+#     if current_user != None and request.method == 'POST':
+#         form = DocumentForm(request.POST, request.FILES)
+#         
+#         if form.is_valid():
+#             newdoc = Document(docfile=facebookConnect.faceDetect(request.FILES['docfile']))
+#             newdoc.save()
+#             
+#             # Redirect to the document list after POST
+#             return HttpResponseRedirect(reverse('faceapp.views.list'))
+#     else:
+#         form = DocumentForm()  # A empty, unbound form
 
     # Load documents for the list page
     documents = [] 
+    docuemnts2 =[]
     
-    for item in Document.objects.all() :
+    for item in Photo.objects.all() :
         if item.docfile != '' :
             documents.append(item)
+    for i in range(0,9) :
+        docuemnts2.append(random.choice(documents))
 
     # Render list page with the documents and the form
     return render_to_response(
         'list2.html',
-        {'documents': documents,
-         'form': form ,
+        {'documents': docuemnts2 ,
+#          'form': form ,
          'current_user' :current_user ,
          'facebook_app_id' : facebookConnect.facebook_app_id
          },
