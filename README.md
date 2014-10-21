@@ -11,5 +11,5 @@ Future Work
 * FaceGroup
 * Clothes Detect
 
-* Screenshot
+Screenshot
 ![image](https://raw.githubusercontent.com/texib/FaceWeb/master/FaceDetect_Coverflow.png)
