@@ -19,15 +19,15 @@ def list(request):
         current_user.access_token = access_token
         photos = facebookConnect.getPhotos(fbGraph)
         if current_user != None : 
-#             for url in  photos :
-#                 photourl = Photo()
-#                 photourl.url = url
-#                 photourl.user = current_user
-#                 dimag = facebookConnect.download_photo(url)
-#                 facesresult = facebookConnect.faceDetect(dimag)
-#                 if facesresult != None :
-#                     photourl.docfile = facesresult
-#                     photourl.save()
+            for url in  photos :
+                photourl = Photo()
+                photourl.url = url
+                photourl.user = current_user
+                dimag = facebookConnect.download_photo(url)
+                facesresult = facebookConnect.faceDetect(dimag)
+                if facesresult != None :
+                    photourl.docfile = facesresult
+                    photourl.save()
             current_user.save()
     
     # Handle file upload
