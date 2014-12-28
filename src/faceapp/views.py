@@ -64,7 +64,16 @@ def list(request):
          },
         context_instance=RequestContext(request)
     )
-    
+
+# def myudf():
+#     '''
+#     
+#     '''
+#     
+#     pass
+#     
+
+
 def demo_piechart(request):
     """
     pieChart page
